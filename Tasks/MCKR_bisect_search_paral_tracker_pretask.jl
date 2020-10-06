@@ -386,7 +386,7 @@ end\n")
                 Standard_error=Standard_error/NN
                 Standard_error=Standard_error/(NN-1)
                 Standard_error=sqrt(Standard_error)
-                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B2\\nI-hat = \$ans2\\ne-hat = \$Standard_error\\n\"
+                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B2\\nI-hat = \$ans2\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
                 Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
                 write(Tracker_file,Tracker_message)
                 close(Tracker_file)
