@@ -36,6 +36,16 @@ function Do_subtask1(Input_lines)
             break
         end
     end
+    First_axis_value="1"
+    for i=1:length(Input_lines) # Detecting the first axis for bisecting along it.
+        line=Input_lines[i]
+        if length(line)>12 && line[1:12]=="First_axis: "
+            First_axis_value=line[13:end]
+            deleteat!(Input_lines,i)
+            break
+        end
+    end
+    write(Temp_input_file,"First_axis=$First_axis_value\n")
     for i=1:length(Input_lines) # Detecting the MC method.
         line=Input_lines[i]
         if length(line)>11 && line[1:11]=="MC_method: "
@@ -123,7 +133,7 @@ end\n")
     for i=1:Box_dimension-1
         push!(Index_list,i)
     end
-    Index1=0
+    Index1=First_axis-1
     Index2=0\n")
         if MC_method=="Simple"
             for i=1:Workers_number
@@ -150,11 +160,11 @@ end\n")
     Standard_error=Standard_error/NN
     Standard_error=Standard_error/(NN-1)
     Standard_error=sqrt(Standard_error)
-    Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B\\nI-hat = \$ans0\\ne-hat = \$Standard_error\\n\"
+    Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B\\nI-hat = \$ans0\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
     Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
     write(Tracker_file,Tracker_message)
     close(Tracker_file)
-    print(\"Bisect step \$Index2\\nSub-box = \$B\\nI-hat = \$ans0\\ne-hat = \$Standard_error\\n\")\n")
+    print(Tracker_message)\n")
         write(Temp_bisect_search_file,"    integral_number=1
     if ans0 < 1.05
         return \"No multistationary sub-box\",integral_number,(time_ns()-st1)/(10^9),Index2,B,ans0
@@ -199,11 +209,11 @@ end\n")
                 Standard_error=Standard_error/NN
                 Standard_error=Standard_error/(NN-1)
                 Standard_error=sqrt(Standard_error)
-                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B1\\nI-hat = \$ans1\\ne-hat = \$Standard_error\\n\"
+                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B1\\nI-hat = \$ans1\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
                 Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
                 write(Tracker_file,Tracker_message)
                 close(Tracker_file)
-                print(\"Bisect step \$Index2\\nSub-box = \$B1\\nI-hat = \$ans1\\ne-hat = \$Standard_error\\n\")\n")
+                print(Tracker_message)\n")
         write(Temp_bisect_search_file,"                B2 = SameBox(B)
                 B2[Index_list[i]][1] = (B[Index_list[i]][1] + B[Index_list[i]][2]) / 2\n")
         if MC_method=="Simple"
@@ -231,11 +241,11 @@ end\n")
                 Standard_error=Standard_error/NN
                 Standard_error=Standard_error/(NN-1)
                 Standard_error=sqrt(Standard_error)
-                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B2\\nI-hat = \$ans2\\ne-hat = \$Standard_error\\n\"
+                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B2\\nI-hat = \$ans2\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
                 Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
                 write(Tracker_file,Tracker_message)
                 close(Tracker_file)
-                print(\"Bisect step \$Index2\\nSub-box = \$B2\\nI-hat = \$ans2\\ne-hat = \$Standard_error\\n\")\n")
+                print(Tracker_message)\n")
         write(Temp_bisect_search_file,"                integral_number+=2
                 if ans1 > ans2
                     B=B1
@@ -295,11 +305,11 @@ end\n")
     Standard_error=Standard_error/NN
     Standard_error=Standard_error/(NN-1)
     Standard_error=sqrt(Standard_error)
-    Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B\\nI-hat = \$ans0\\ne-hat = \$Standard_error\\n\"
+    Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B\\nI-hat = \$ans0\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
     Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
     write(Tracker_file,Tracker_message)
     close(Tracker_file)
-    print(\"Bisect step \$Index2\\nSub-box = \$B\\nI-hat = \$ans0\\ne-hat = \$Standard_error\\n\")\n")
+    print(Tracker_message)\n")
         write(Temp_bisect_search_file,"    integral_number=1
     if ans0 < 1.05
         return \"No multistationary sub-box\",integral_number,Index2,B,ans0
@@ -344,11 +354,11 @@ end\n")
                 Standard_error=Standard_error/NN
                 Standard_error=Standard_error/(NN-1)
                 Standard_error=sqrt(Standard_error)
-                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B1\\nI-hat = \$ans1\\ne-hat = \$Standard_error\\n\"
+                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B1\\nI-hat = \$ans1\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
                 Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
                 write(Tracker_file,Tracker_message)
                 close(Tracker_file)
-                print(\"Bisect step \$Index2\\nSub-box = \$B1\\nI-hat = \$ans1\\ne-hat = \$Standard_error\\n\")\n")
+                print(Tracker_message)\n")
         write(Temp_bisect_search_file,"                B2 = SameBox(B)
                 B2[Index_list[i]][1] = (B[Index_list[i]][1] + B[Index_list[i]][2]) / 2\n")
         if MC_method=="Simple"
@@ -380,7 +390,7 @@ end\n")
                 Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
                 write(Tracker_file,Tracker_message)
                 close(Tracker_file)
-                print(\"Bisect step \$Index2\\nSub-box = \$B2\\nI-hat = \$ans2\\ne-hat = \$Standard_error\\n\")\n")
+                print(Tracker_message)\n")
         write(Temp_bisect_search_file,"                integral_number+=2
                 if ans1 > ans2
                     B=B1
