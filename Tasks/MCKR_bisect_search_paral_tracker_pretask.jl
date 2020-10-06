@@ -209,7 +209,7 @@ end\n")
                 Standard_error=Standard_error/NN
                 Standard_error=Standard_error/(NN-1)
                 Standard_error=sqrt(Standard_error)
-                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B1\\nI-hat = \$ans1\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
+                Tracker_message=\"Bisect step \$Index2\\nAxis no. \$Index1\\nSub-box = \$B1\\nI-hat = \$ans1\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
                 Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
                 write(Tracker_file,Tracker_message)
                 close(Tracker_file)
@@ -241,7 +241,7 @@ end\n")
                 Standard_error=Standard_error/NN
                 Standard_error=Standard_error/(NN-1)
                 Standard_error=sqrt(Standard_error)
-                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B2\\nI-hat = \$ans2\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
+                Tracker_message=\"Bisect step \$Index2\\nAxis no. \$Index1\\nSub-box = \$B2\\nI-hat = \$ans2\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
                 Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
                 write(Tracker_file,Tracker_message)
                 close(Tracker_file)
@@ -278,7 +278,7 @@ end\n")
     for i=1:Box_dimension-1
         push!(Index_list,i)
     end
-    Index1=0
+    Index1=First_axis
     Index2=0\n")
         if MC_method=="Simple"
             for i=1:Workers_number
@@ -305,7 +305,7 @@ end\n")
     Standard_error=Standard_error/NN
     Standard_error=Standard_error/(NN-1)
     Standard_error=sqrt(Standard_error)
-    Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B\\nI-hat = \$ans0\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
+    Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B\\nI-hat = \$ans0\\ne-hat = \$Standard_error\\n\"
     Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
     write(Tracker_file,Tracker_message)
     close(Tracker_file)
@@ -354,7 +354,7 @@ end\n")
                 Standard_error=Standard_error/NN
                 Standard_error=Standard_error/(NN-1)
                 Standard_error=sqrt(Standard_error)
-                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B1\\nI-hat = \$ans1\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
+                Tracker_message=\"Bisect step \$Index2\\nAxis no. \$Index1\\nSub-box = \$B1\\nI-hat = \$ans1\\ne-hat = \$Standard_error\\n\"
                 Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
                 write(Tracker_file,Tracker_message)
                 close(Tracker_file)
@@ -386,7 +386,7 @@ end\n")
                 Standard_error=Standard_error/NN
                 Standard_error=Standard_error/(NN-1)
                 Standard_error=sqrt(Standard_error)
-                Tracker_message=\"Bisect step \$Index2\\nSub-box = \$B2\\nI-hat = \$ans2\\ne-hat = \$Standard_error\\nTime = \$((time_ns()-st1)/(10^9)) seconds\\n\"
+                Tracker_message=\"Bisect step \$Index2\\nAxis no. \$Index1\\nSub-box = \$B2\\nI-hat = \$ans2\\ne-hat = \$Standard_error\\n\"
                 Tracker_file=open(joinpath(pwd(),\"tracker.txt\"),\"a\")
                 write(Tracker_file,Tracker_message)
                 close(Tracker_file)
