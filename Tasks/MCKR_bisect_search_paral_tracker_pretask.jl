@@ -278,7 +278,7 @@ end\n")
     for i=1:Box_dimension-1
         push!(Index_list,i)
     end
-    Index1=First_axis
+    Index1=First_axis-1
     Index2=0\n")
         if MC_method=="Simple"
             for i=1:Workers_number
