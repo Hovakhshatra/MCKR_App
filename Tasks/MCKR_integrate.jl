@@ -11,19 +11,11 @@ function Do_task()
     push!(Task_output,"\nConsider the $MC_method Monte Carlo integration for the $(MCKR_file_name[1:end-3]) example on the box\n$Box\nand N=$Sample_size.\n")
     out1=MC_integration(Box,100) # Just to warm up Julia about this function.
     out1=MC_integration(Box,Sample_size)
-    if integration_time_request==1
-        if e_hat_request==1
-            push!(Task_output,"\nI-hat = $(out1[1]), e-hat = $(out1[2]), integration time = $(out1[3]) seconds\n")
-        else
-            push!(Task_output,"\nI-hat = $(out1[1]), integration time = $(out1[3]) seconds\n")
-        end
-    else
-        if e_hat_request==1
-            push!(Task_output,"\nI-hat = $(out1[1]), e-hat = $(out1[2])\n")
-        else
-            push!(Task_output,"\nI-hat = $(out1[1])\n")
-        end
-    end
+    Output_dict=Dict([1,1]=>"\nI-hat = $(out1[1]), e-hat = $(out1[2]), integration time = $(out1[3]) seconds\n",
+                     [1,0]=>"\nI-hat = $(out1[1]), integration time = $(out1[3]) seconds\n",
+                     [0,1]=>"\nI-hat = $(out1[1]), e-hat = $(out1[2])\n",
+                     [0,0]=>"\nI-hat = $(out1[1])\n")
+    push!(Task_output,Output_dict[[integration_time_request,e_hat_request]])
     push!(Task_output,"\n\u066d End of computations.")
     return(Task_output)
 end
