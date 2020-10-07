@@ -3,7 +3,7 @@
 
 
 function Do_subtask1(Input_lines)
-    # Reading the inputs from the Input_lines and writes a temperory input julia file for the current tasks.
+    # Reading the inputs from the Input_lines and writes a temporary input julia file for the current tasks.
     Temp_input_file=open(joinpath(pwd(),"Temp","MCKR_method_comparison_table_paral_input.jl"),"w")
     for i=1:length(Input_lines) # Detecting the MCKR file.
         line=Input_lines[i]
@@ -47,7 +47,7 @@ function Do_subtask1(Input_lines)
 end
 
 function Do_subtask2()
-    # Making a temperory julia file for single parallel integration with e-hat.
+    # Making a temporary julia file for single parallel integration with e-hat.
     include(joinpath(pwd(),"Temp","MCKR_method_comparison_table_paral_input.jl"))
     Temp_parallel_file=open(joinpath(pwd(),"Temp","MCKR_integrate_paral.jl"),"w")
     write(Temp_parallel_file,"include(joinpath(pwd(),\"Temp\",\"MCKR_method_comparison_table_paral_input.jl\"))
