@@ -2,7 +2,7 @@
 # This file compares the speed of computation of a MCKR integral computation for the two case of with and without parallelization.
 
 using Distributed # A package for parallelization.
-# Loading temperory julia files written by pretask file.
+# Loading temporary julia files written by pretask file.
 include(joinpath(pwd(),"Temp","MCKR_parallel_compare_input.jl"))
 include(joinpath(pwd(),"Temp","MCKR_parallel_compare_nonparallel.jl"))
 include(joinpath(pwd(),"Temp","MCKR_parallel_compare_parallel.jl"))
@@ -12,7 +12,7 @@ function Do_task()
     Task_output=["\u066d Information of the computing system.\n"]
     # Adding extra workers.
     addprocs(Workers_number)
-    # Loading the temperory input file for the extra workers as well.
+    # Loading the temporary input file for the extra workers as well.
     @everywhere include(joinpath(pwd(),"Temp","MCKR_parallel_compare_input.jl"))
     # Loading the MCKR file for all workers.
     @everywhere include(joinpath(pwd(),"Example_MCKR_bank",MCKR_file_name))
