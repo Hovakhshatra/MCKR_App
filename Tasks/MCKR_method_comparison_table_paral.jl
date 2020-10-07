@@ -23,7 +23,7 @@ function Do_task()
     push!(Task_output,"\nHere we compare e-hat and the computation time of the simple and antithetic Monte Carlo integrations for the $(MCKR_file_name[1:end-3]) example on the following box\n$Box\nThe considered sample size runs from $Sample_size_start to $(Sample_size_range[3]) with $(Sample_size_range[2])-fold increases.\n\n")
     # Adding extra workers.
     addprocs(Workers_number)
-    # Loading the temperory input file for the extra workers as well.
+    # Loading the temporary input file for the extra workers as well.
     @everywhere include(joinpath(pwd(),"Temp","MCKR_method_comparison_table_paral_input.jl"))
     # Loading the MCKR file for all workers.
     @everywhere include(joinpath(pwd(),"Example_MCKR_bank",MCKR_file_name))
