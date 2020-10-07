@@ -2,7 +2,7 @@
 # This file compares the speed of computation of a MCKR integral computation for the two case of with and without parallelization.
 
 function Do_subtask1(Input_lines)
-    # Reading the inputs from the Input_lines and writes a temperory input julia file for the current tasks.
+    # Reading the inputs from the Input_lines and writes a temporary input julia file for the current tasks.
     Temp_input_file=open(joinpath(pwd(),"Temp","MCKR_parallel_compare_input.jl"),"w")
     for i=1:length(Input_lines) # Detecting the MCKR file.
         line=Input_lines[i]
@@ -48,19 +48,16 @@ function Do_subtask1(Input_lines)
 end
 
 function Do_subtask2()
-    # Making a temperory julia file for non-parallel MC computation.
+    # Making a temporary julia file for non-parallel MC computation.
     include(joinpath(pwd(),"Temp","MCKR_parallel_compare_input.jl"))
     Temp_nonparallel_file=open(joinpath(pwd(),"Temp","MCKR_parallel_compare_nonparallel.jl"),"w")
+    Method_dict=Dict("Simple"=>"sumo_with_S","Antithetic"=>"sumo_antithetic_with_S")
     write(Temp_nonparallel_file,"include(joinpath(pwd(),\"Temp\",\"MCKR_parallel_compare_input.jl\"))
 include(joinpath(pwd(),\"Example_MCKR_bank\",MCKR_file_name))
 function nonparallel_t(NN)
-    st=time_ns()")
-    if MC_method=="Simple"
-        write(Temp_nonparallel_file,"\n    ans_nonparallel=sumo_with_S(Box,NN)")
-    elseif MC_method=="Antithetic"
-        write(Temp_nonparallel_file,"\n    ans_nonparallel=sumo_antithetic_with_S(Box,NN)")
-    end
-    write(Temp_nonparallel_file,"\n    standard_error=ans_nonparallel[2]/NN
+    st=time_ns()
+    ans_nonparallel=$(Method_dict[MC_method])(Box,NN)
+    standard_error=ans_nonparallel[2]/NN
     standard_error=standard_error/(NN-1)
     standard_error=sqrt(standard_error)
     st=time_ns()-st
@@ -70,21 +67,16 @@ end")
 end
 
 function Do_subtask3()
-    # Making a temperory julia file for parallel case.
+    # Making a temporary julia file for parallel case.
     include(joinpath(pwd(),"Temp","MCKR_parallel_compare_input.jl"))
     Temp_parallel_file=open(joinpath(pwd(),"Temp","MCKR_parallel_compare_parallel.jl"),"w")
+    Method_dict=Dict("Simple"=>"sumo_with_S","Antithetic"=>"sumo_antithetic_with_S")
     write(Temp_parallel_file,"include(joinpath(pwd(),\"Temp\",\"MCKR_parallel_compare_input.jl\"))
 include(joinpath(pwd(),\"Example_MCKR_bank\",MCKR_file_name))
 function parallel_t(NN)
     st=time_ns()\n")
-    if MC_method=="Simple"
-        for i=1:Workers_number
-            write(Temp_parallel_file,"    w$(i)ans1=remotecall(sumo_with_S,$(1+i),Box,floor(NN/Workers_number))\n")
-        end
-    elseif MC_method=="Antithetic"
-        for i=1:Workers_number
-            write(Temp_parallel_file,"    w$(i)ans1=remotecall(sumo_antithetic_with_S,$(1+i),Box,floor(NN/Workers_number))\n")
-        end
+    for i=1:Workers_number
+        write(Temp_parallel_file,"    w$(i)ans1=remotecall($(Method_dict[MC_method]),$(1+i),Box,floor(NN/Workers_number))\n")
     end
     for i=1:Workers_number
         write(Temp_parallel_file,"    ans2w$(i)=fetch(w$(i)ans1)\n")
