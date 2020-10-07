@@ -17,42 +17,20 @@ push!(Report_lines,"\u066D End of input.\n")
 push!(Report_lines,"\n")
 
 # Detecting the task.
+Task_dict=Dict("MCKR parallel compare"=>"MCKR_parallel_compare",
+               "MCKR integrate"=>"MCKR_integrate",
+               "MCKR integrate parallelized"=>"MCKR_integrate_paral",
+               "MCKR bisect search"=>"MCKR_bisect_search",
+               "MCKR bisect search parallelized"=>"MCKR_bisect_search_paral",
+               "MCKR bisect search parallelized - include tracking"=>"MCKR_bisect_search_paral_tracker",
+               "MCKR method comparison table parallelized"=>"MCKR_method_comparison_table_paral",
+               "MCKR method comparison table parallelized - include tracking"=>"MCKR_method_comparison_table_paral_tracker")
 for i=1:length(Input_lines)
     line=Input_lines[i]
     if length(line)>6 && line[1:6]=="Task: "
-        if line[7:end]=="MCKR parallel compare"
-            global Responsible_Julia_file_name="MCKR_parallel_compare"
-            deleteat!(Input_lines,i)
-            break
-        elseif line[7:end]=="MCKR integrate"
-            global Responsible_Julia_file_name="MCKR_integrate"
-            deleteat!(Input_lines,i)
-            break
-        elseif line[7:end]=="MCKR integrate parallelized"
-            global Responsible_Julia_file_name="MCKR_integrate_paral"
-            deleteat!(Input_lines,i)
-            break
-        elseif line[7:end]=="MCKR integrate bisect search"
-            global Responsible_Julia_file_name="MCKR_bisect_search"
-            deleteat!(Input_lines,i)
-            break
-        elseif line[7:end]=="MCKR integrate bisect search parallelized"
-            global Responsible_Julia_file_name="MCKR_bisect_search_paral"
-            deleteat!(Input_lines,i)
-            break
-        elseif line[7:end]=="MCKR integrate bisect search parallelized - include tracking"
-            global Responsible_Julia_file_name="MCKR_bisect_search_paral_tracker"
-            deleteat!(Input_lines,i)
-            break
-        elseif line[7:end]=="MCKR method comparison table parallelized"
-            global Responsible_Julia_file_name="MCKR_method_comparison_table_paral"
-            deleteat!(Input_lines,i)
-            break
-        elseif line[7:end]=="MCKR method comparison table parallelized - include tracking"
-            global Responsible_Julia_file_name="MCKR_method_comparison_table_paral_tracker"
-            deleteat!(Input_lines,i)
-            break
-        end
+        global Responsible_Julia_file_name=Task_dict[line[7:end]]
+        deleteat!(Input_lines,i)
+        break
     end
 end
 
