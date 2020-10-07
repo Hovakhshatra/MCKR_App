@@ -13,42 +13,21 @@ function Do_task()
     out1=MC_search(Box,Sample_size)
     if Searching_time_request==1
         push!(Task_output,"\n$(out1[1]).\nIt took $(out1[3]) seconds and computed $(out1[2]) integrals.\nNumber of bisecting step = $(out1[4])\nThe last sub-box = $(out1[5])\nwith I-hat = $(out1[6])\n")
-        if Last_box_info_request==1
-            if MC_method=="Simple"
-                out2=sumo_with_S(out1[5],100) # just to warm-up Julia for this function.
-                out2=sumo_with_S(out1[5],Sample_size)
-                standard_error=out2[2]/Sample_size
-                standard_error=out2/(Sample_size-1)
-                standard_error=sqrt(standard_error)
-                push!(Task_output,"\nComputing the MCKR on the last sub-box again.\nI-hat = $(out2[1]), e-hat = $Standard_error\n")
-            elseif MC_method=="Antithetic"
-                out2=sumo_antithetic_with_S(out1[5],100) # just to warm-up Julia for this function.
-                out2=sumo_antithetic_with_S(out1[5],Sample_size)
-                Standard_error=out2[2]/Sample_size
-                Standard_error=Standard_error/(Sample_size-1)
-                Standard_error=sqrt(Standard_error)
-                push!(Task_output,"\nComputing the MCKR on the last sub-box again.\nI-hat = $(out2[1]), e-hat = $Standard_error\n")
-            end
-        end
     else
-        push!(Task_output,"\n$(out1[1]).\nIt computed $(out1[2]) integrals.\nNumber of bisecting step = $(out1[4])\nThe last sub-box = $(out1[5])\nwith I-hat = $(out1[6])\n")
-        if Last_box_info_request==1
-            if MC_method=="Simple"
-                out2=sumo_with_S(out1[5],100) # just to warm-up Julia for this function.
-                out2=sumo_with_S(out1[5],Sample_size)
-                standard_error=out2[2]/Sample_size
-                standard_error=out2/(Sample_size-1)
-                standard_error=sqrt(standard_error)
-                push!(Task_output,"\nComputing the MCKR on the last sub-box again.\nI-hat = $(out2[1]), e-hat = $Standard_error\n")
-            elseif MC_method=="Antithetic"
-                out2=sumo_antithetic_with_S(out1[5],100) # just to warm-up Julia for this function.
-                out2=sumo_antithetic_with_S(out1[5],Sample_size)
-                standard_error=out2[2]/Sample_size
-                standard_error=out2/(Sample_size-1)
-                standard_error=sqrt(standard_error)
-                push!(Task_output,"\nComputing the MCKR on the last sub-box again.\nI-hat = $(out2[1]), e-hat = $Standard_error\n")
-            end
+        push!(Task_output,"\n$(out1[1]).\nIt computed $(out1[2]) integrals.\nNumber of bisecting step = $(out1[3])\nThe last sub-box = $(out1[4])\nwith I-hat = $(out1[5])\n")
+    end
+    if Last_box_info_request==1
+        if MC_method=="Antithetic"
+            out2=sumo_antithetic_with_S(out1[5],100) # just to warm-up Julia for this function.
+            out2=sumo_antithetic_with_S(out1[5],Sample_size)
+        elseif MC_method=="Simple"
+            out2=sumo_with_S(out1[5],100) # just to warm-up Julia for this function.
+            out2=sumo_with_S(out1[5],Sample_size)
         end
+        Standard_error=out2[2]/Sample_size
+        Standard_error=Standard_error/(Sample_size-1)
+        Standard_error=sqrt(Standard_error)
+        push!(Task_output,"\nComputing the MCKR on the last sub-box again.\nI-hat = $(out2[1]), e-hat = $Standard_error\n")
     end
     push!(Task_output,"\n\u066d End of computations.")
     return(Task_output)
