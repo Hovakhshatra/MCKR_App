@@ -2,7 +2,7 @@
 # The MCKR task is going to use the bisect search to find a sub-box entirely inside the region of multistationarity or reject existing of such a box.
 
 function Do_subtask1(Input_lines)
-    # Reading the inputs from the Input_lines and writes a temperory input julia file for the current tasks.
+    # Reading the inputs from the Input_lines and writes a temporary input julia file for the current tasks.
     Temp_input_file=open(joinpath(pwd(),"Temp","MCKR_bisect_search_paral_input.jl"),"w")
     for i=1:length(Input_lines) # Detecting the MCKR file.
         line=Input_lines[i]
@@ -36,6 +36,16 @@ function Do_subtask1(Input_lines)
             break
         end
     end
+    First_axis_value="1"
+    for i=1:length(Input_lines) # Detecting the first axis for bisecting along it.
+        line=Input_lines[i]
+        if length(line)>12 && line[1:12]=="First_axis: "
+            First_axis_value=line[13:end]
+            deleteat!(Input_lines,i)
+            break
+        end
+    end
+    write(Temp_input_file,"First_axis=$First_axis_value\n")
     for i=1:length(Input_lines) # Detecting the MC method.
         line=Input_lines[i]
         if length(line)>11 && line[1:11]=="MC_method: "
@@ -96,23 +106,19 @@ function Do_subtask1(Input_lines)
 end
 
 function Do_subtask2()
-    # Making a temperory julia file for bisect search.
+    # Making a temporary julia file for bisect search.
     include(joinpath(pwd(),"Temp","MCKR_bisect_search_paral_input.jl"))
     Temp_bisect_search_file=open(joinpath(pwd(),"Temp","MCKR_bisect_search_paral.jl"),"w")
+    Method_dict=Dict("Simple"=>"sumo","Antithetic"=>"sumo_antithetic")
+    Time_dict=Dict(1=>["    st1=time_ns()\n","(time_ns()-st1)/(10^9),"],0=>["",""])
     write(Temp_bisect_search_file,"include(joinpath(pwd(),\"Temp\",\"MCKR_bisect_search_paral_input.jl\"))
 include(joinpath(pwd(),\"Example_MCKR_bank\",MCKR_file_name))
 function SameBox(B) # To copy a box without dependency between the copy and the original.
     return(deepcopy(B))
 end\n")
-    write(Temp_bisect_search_file,"function MC_search(B,NN,Index2_stop)\n")
-    if MC_method=="Simple"
-        write(Temp_bisect_search_file,"    sumo(B,100) # Just to warn up Julia about ths function\n")
-    elseif MC_method=="Antithetic"
-        write(Temp_bisect_search_file,"    sumo_antithetic(B,100) # Just to warn up Julia about ths function\n")
-    end
-    if Searching_time_request==1
-        write(Temp_bisect_search_file,"    st1=time_ns()
-    Box_dimension = length(B)
+    write(Temp_bisect_search_file,"function MC_search(B,NN,Index2_stop)
+    $(Method_dict[MC_method])(B,100) # Just to warm up Julia about this function\n")
+    write(Temp_bisect_search_file,"$(Time_dict[Searching_time_request][1])    Box_dimension = length(B)
     Index_list=[]
     for i=1:Box_dimension
         push!(Index_list,i)
@@ -120,30 +126,24 @@ end\n")
     for i=1:Box_dimension-1
         push!(Index_list,i)
     end
-    Index1=0
+    Index1=First_axis-1
     Index2=0\n")
-        if MC_method=="Simple"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"    w$(i)ans1=remotecall(sumo,$(1+i),B,floor(NN/Workers_number))\n")
-            end
-        elseif MC_method=="Antithetic"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"    w$(i)ans1=remotecall(sumo_antithetic,$(1+i),B,floor(NN/Workers_number))\n")
-            end
-        end
-        for i=1:Workers_number
-            write(Temp_bisect_search_file,"    ans2w$(i)=fetch(w$(i)ans1)\n")
-        end
-        write(Temp_bisect_search_file,"    ans0=(")
-        for i=1:Workers_number-1
-            write(Temp_bisect_search_file,"ans2w$(i)+")
-        end
-        write(Temp_bisect_search_file,"ans2w$Workers_number)/Workers_number\n")
-        write(Temp_bisect_search_file,"    integral_number=1
+    for i=1:Workers_number
+        write(Temp_bisect_search_file,"    w$(i)ans1=remotecall($(Method_dict[MC_method]),$(1+i),B,floor(NN/Workers_number))\n")
+    end
+    for i=1:Workers_number
+        write(Temp_bisect_search_file,"    ans2w$(i)=fetch(w$(i)ans1)\n")
+    end
+    write(Temp_bisect_search_file,"    ans0=(")
+    for i=1:Workers_number-1
+        write(Temp_bisect_search_file,"ans2w$(i)+")
+    end
+    write(Temp_bisect_search_file,"ans2w$Workers_number)/Workers_number\n")
+    write(Temp_bisect_search_file,"    integral_number=1
     if ans0 < 1.05
-        return \"No multistationary sub-box\",integral_number,(time_ns()-st1)/(10^9),Index2,B,ans0
+        return \"No multistationary sub-box\",integral_number,$(Time_dict[Searching_time_request][2])Index2,B,ans0
     elseif ans0 > 2.95
-        return \"Found multistationary sub-box\",integral_number,(time_ns()-st1)/(10^9),Index2,B,ans0
+        return \"Found multistationary sub-box\",integral_number,$(Time_dict[Searching_time_request][2])Index2,B,ans0
     end
     @inbounds while Index2 != Index2_stop
         if Index1 == Box_dimension
@@ -158,43 +158,31 @@ end\n")
                 Index2 += 1
                 B1 = SameBox(B)
                 B1[Index_list[i]][2] = (B[Index_list[i]][1] + B[Index_list[i]][2]) / 2\n")
-        if MC_method=="Simple"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"                w$(i)ans1=remotecall(sumo,$(1+i),B1,floor(NN/Workers_number))\n")
-            end
-        elseif MC_method=="Antithetic"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"                w$(i)ans1=remotecall(sumo_antithetic,$(1+i),B1,floor(NN/Workers_number))\n")
-            end
-        end
-        for i=1:Workers_number
-            write(Temp_bisect_search_file,"                ans2w$(i)=fetch(w$(i)ans1)\n")
-        end
-        write(Temp_bisect_search_file,"                ans1=(")
-        for i=1:Workers_number-1
-            write(Temp_bisect_search_file,"ans2w$(i)+")
-        end
-        write(Temp_bisect_search_file,"ans2w$Workers_number)/Workers_number\n")
-        write(Temp_bisect_search_file,"                B2 = SameBox(B)
+    for i=1:Workers_number
+        write(Temp_bisect_search_file,"                w$(i)ans1=remotecall($(Method_dict[MC_method]),$(1+i),B1,floor(NN/Workers_number))\n")
+    end
+    for i=1:Workers_number
+        write(Temp_bisect_search_file,"                ans2w$(i)=fetch(w$(i)ans1)\n")
+    end
+    write(Temp_bisect_search_file,"                ans1=(")
+    for i=1:Workers_number-1
+        write(Temp_bisect_search_file,"ans2w$(i)+")
+    end
+    write(Temp_bisect_search_file,"ans2w$Workers_number)/Workers_number\n")
+    write(Temp_bisect_search_file,"                B2 = SameBox(B)
                 B2[Index_list[i]][1] = (B[Index_list[i]][1] + B[Index_list[i]][2]) / 2\n")
-        if MC_method=="Simple"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"                w$(i)ans1=remotecall(sumo,$(1+i),B2,floor(NN/Workers_number))\n")
-            end
-        elseif MC_method=="Antithetic"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"                w$(i)ans1=remotecall(sumo_antithetic,$(1+i),B2,floor(NN/Workers_number))\n")
-            end
-        end
-        for i=1:Workers_number
-            write(Temp_bisect_search_file,"                ans2w$(i)=fetch(w$(i)ans1)\n")
-        end
-        write(Temp_bisect_search_file,"                ans2=(")
-        for i=1:Workers_number-1
-            write(Temp_bisect_search_file,"ans2w$(i)+")
-        end
-        write(Temp_bisect_search_file,"ans2w$Workers_number)/Workers_number\n")
-        write(Temp_bisect_search_file,"                integral_number+=2
+    for i=1:Workers_number
+        write(Temp_bisect_search_file,"                w$(i)ans1=remotecall($(Method_dict[MC_method]),$(1+i),B2,floor(NN/Workers_number))\n")
+    end
+    for i=1:Workers_number
+        write(Temp_bisect_search_file,"                ans2w$(i)=fetch(w$(i)ans1)\n")
+    end
+    write(Temp_bisect_search_file,"                ans2=(")
+    for i=1:Workers_number-1
+        write(Temp_bisect_search_file,"ans2w$(i)+")
+    end
+    write(Temp_bisect_search_file,"ans2w$Workers_number)/Workers_number\n")
+    write(Temp_bisect_search_file,"                integral_number+=2
                 if ans1 > ans2
                     B=B1
                     ans0=ans1
@@ -203,144 +191,32 @@ end\n")
                     ans0=ans2
                 end
                 if ans0 < 1.05
-                    return \"No multistationary sub-box\",integral_number,(time_ns()-st1)/(10^9),Index2,B,ans0
+                    return \"No multistationary sub-box\",integral_number,$(Time_dict[Searching_time_request][2])Index2,B,ans0
                 elseif ans0 > 2.95
-                    return \"Found multistationary sub-box\",integral_number,(time_ns()-st1)/(10^9),Index2,B,ans0
+                    return \"Found multistationary sub-box\",integral_number,$(Time_dict[Searching_time_request][2])Index2,B,ans0
                 end
                 break
             end
         end
         if Size_stop==1
-            return \"Termination condition on the size of sub-boxes reached.\",integral_number,(time_ns()-st1)/(10^9),Index2,B,ans0
+            return \"Termination condition on the size of sub-boxes reached.\",integral_number,$(Time_dict[Searching_time_request][2])Index2,B,ans0
         end
     end
-    st2=time_ns()
-    return \"Termination condition on the number of bisect steps reached.\",integral_number,(time_ns()-st1)/(10^9),Index2,B,ans0
+    return \"Termination condition on the number of bisect steps reached.\",integral_number,$(Time_dict[Searching_time_request][2])Index2,B,ans0
 end\n")
-    else
-        write(Temp_bisect_search_file,"    Box_dimension = length(B)
-    Index_list=[]
-    for i=1:Box_dimension
-        push!(Index_list,i)
-    end
-    for i=1:Box_dimension-1
-        push!(Index_list,i)
-    end
-    Index1=0
-    Index2=0\n")
-        if MC_method=="Simple"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"    w$(i)ans1=remotecall(sumo,$(1+i),B,floor(NN/Workers_number))\n")
-            end
-        elseif MC_method=="Antithetic"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"    w$(i)ans1=remotecall(sumo_antithetic,$(1+i),B,floor(NN/Workers_number))\n")
-            end
-        end
-        for i=1:Workers_number
-            write(Temp_bisect_search_file,"    ans2w$(i)=fetch(w$(i)ans1)\n")
-        end
-        write(Temp_bisect_search_file,"    ans0=(")
-        for i=1:Workers_number-1
-            write(Temp_bisect_search_file,"ans2w$(i)+")
-        end
-        write(Temp_bisect_search_file,"ans2w$Workers_number)/Workers_number\n")
-        write(Temp_bisect_search_file,"    integral_number=1
-    if ans0 < 1.05
-        return \"No multistationary sub-box\",integral_number,Index2,B,ans0
-    elseif ans0 > 2.95
-        return \"Found multistationary sub-box\",integral_number,Index2,B,ans0
-    end
-    @inbounds while Index2 != Stop_criterion_bisect_step
-        if Index1 == Box_dimension
-            Index1 = 1
-        else
-            Index1 += 1
-        end
-        Size_stop=1
-        for i=Index1:Index1+Box_dimension-1
-            if B[Index_list[i]][2]-B[Index_list[i]][1] > Stop_criterion_subbox_size[Index_list[i]]
-                Size_stop=0
-                Index2 += 1
-                B1 = SameBox(B)
-                B1[Index_list[i]][2] = (B[Index_list[i]][1] + B[Index_list[i]][2]) / 2\n")
-        if MC_method=="Simple"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"                w$(i)ans1=remotecall(sumo,$(1+i),B1,floor(NN/Workers_number))\n")
-            end
-        elseif MC_method=="Antithetic"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"                w$(i)ans1=remotecall(sumo_antithetic,$(1+i),B1,floor(NN/Workers_number))\n")
-            end
-        end
-        for i=1:Workers_number
-            write(Temp_bisect_search_file,"                ans2w$(i)=fetch(w$(i)ans1)\n")
-        end
-        write(Temp_bisect_search_file,"                ans1=(")
-        for i=1:Workers_number-1
-            write(Temp_bisect_search_file,"ans2w$(i)+")
-        end
-        write(Temp_bisect_search_file,"ans2w$Workers_number)/Workers_number\n")
-        write(Temp_bisect_search_file,"                B2 = SameBox(B)
-                B2[Index_list[i]][1] = (B[Index_list[i]][1] + B[Index_list[i]][2]) / 2\n")
-        if MC_method=="Simple"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"                w$(i)ans1=remotecall(sumo,$(1+i),B2,floor(NN/Workers_number))\n")
-            end
-        elseif MC_method=="Antithetic"
-            for i=1:Workers_number
-                write(Temp_bisect_search_file,"                w$(i)ans1=remotecall(sumo_antithetic,$(1+i),B2,floor(NN/Workers_number))\n")
-            end
-        end
-        for i=1:Workers_number
-            write(Temp_bisect_search_file,"                ans2w$(i)=fetch(w$(i)ans1)\n")
-        end
-        write(Temp_bisect_search_file,"                ans2=(")
-        for i=1:Workers_number-1
-            write(Temp_bisect_search_file,"ans2w$(i)+")
-        end
-        write(Temp_bisect_search_file,"ans2w$Workers_number)/Workers_number\n")
-        write(Temp_bisect_search_file,"                integral_number+=2
-                if ans1 > ans2
-                    B=B1
-                    ans0=ans1
-                else
-                    B=B2
-                    ans0=ans2
-                end
-                if ans0 < 1.05
-                    return \"No multistationary sub-box\",integral_number,Index2,B,ans0
-                elseif ans0 > 2.95
-                    return \"Found multistationary sub-box\",integral_number,Index2,B,ans0
-                end
-                break
-            end
-        end
-        if Size_stop==1
-            return \"Termination condition on the size of sub-boxes reached.\",integral_number,Index2,B,ans0
-        end
-    end
-    return \"Termination condition on the number of bisect steps reached.\",integral_number,Index2,B,ans0
-end\n")
-    end
     close(Temp_bisect_search_file)
 end
 
 function Do_subtask3()
-    # Making a temperory julia file for single parallel integration with e-hat.
+    # Making a temporary julia file for single parallel integration with e-hat.
     include(joinpath(pwd(),"Temp","MCKR_bisect_search_paral_input.jl"))
     Temp_parallel_file=open(joinpath(pwd(),"Temp","MCKR_integrate_paral.jl"),"w")
+    Method_dict=Dict("Simple"=>"sumo_with_S","Antithetic"=>"sumo_antithetic_with_S")
     write(Temp_parallel_file,"include(joinpath(pwd(),\"Temp\",\"MCKR_bisect_search_paral_input.jl\"))
 include(joinpath(pwd(),\"Example_MCKR_bank\",MCKR_file_name))
 function MC_integration(B,NN)\n")
-    if MC_method=="Simple"
-        for i=1:Workers_number
-            write(Temp_parallel_file,"    w$(i)ans1=remotecall(sumo_with_S,$(1+i),B,floor(NN/Workers_number))\n")
-        end
-    elseif MC_method=="Antithetic"
-        for i=1:Workers_number
-            write(Temp_parallel_file,"    w$(i)ans1=remotecall(sumo_antithetic_with_S,$(1+i),B,floor(NN/Workers_number))\n")
-        end
+    for i=1:Workers_number
+        write(Temp_parallel_file,"    w$(i)ans1=remotecall($(Method_dict[MC_method]),$(1+i),B,floor(NN/Workers_number))\n")
     end
     for i=1:Workers_number
         write(Temp_parallel_file,"    ans2w$(i)=fetch(w$(i)ans1)\n")
