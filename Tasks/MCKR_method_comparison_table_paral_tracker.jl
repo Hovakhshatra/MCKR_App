@@ -27,7 +27,7 @@ function Do_task()
     close(Tracker_file)
     # Adding extra workers.
     addprocs(Workers_number)
-    # Loading the temperory input file for the extra workers as well.
+    # Loading the temporary input file for the extra workers as well.
     @everywhere include(joinpath(pwd(),"Temp","MCKR_method_comparison_table_paral_input.jl"))
     # Loading the MCKR file for all workers.
     @everywhere include(joinpath(pwd(),"Example_MCKR_bank",MCKR_file_name))
