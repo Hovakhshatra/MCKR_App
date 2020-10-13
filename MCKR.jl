@@ -24,7 +24,9 @@ Task_dict=Dict("MCKR parallel compare"=>"MCKR_parallel_compare",
                "MCKR bisect search parallelized"=>"MCKR_bisect_search_paral",
                "MCKR bisect search parallelized - include tracking"=>"MCKR_bisect_search_paral_tracker",
                "MCKR method comparison table parallelized"=>"MCKR_method_comparison_table_paral",
-               "MCKR method comparison table parallelized - include tracking"=>"MCKR_method_comparison_table_paral_tracker")
+               "MCKR method comparison table parallelized - include tracking"=>"MCKR_method_comparison_table_paral_tracker",
+               "MCKR generate example - conserved and positive orthant"=>"MCKR_generate_example_special",
+               "MCKR generate example"=>"MCKR_generate_example")
 for i=1:length(Input_lines)
     line=Input_lines[i]
     if length(line)>6 && line[1:6]=="Task: "
