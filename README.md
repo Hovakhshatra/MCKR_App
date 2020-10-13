@@ -1,4 +1,5 @@
 # MCKR
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4085079.svg)](https://doi.org/10.5281/zenodo.4085079)
 
 This repository contains an implementation in Julia of the algorithms in the manuscript "Kac-Rice formulas and the number of solutions of parametrized systems of polynomial equations". By using the code of this repository or using a result of a computation done by this code, the manuscript [1] should be cited.
 
